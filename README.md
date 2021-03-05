@@ -9,4 +9,6 @@
 - Apache Airflow and Streaming
 - Data Modeling
 
-<img src="https://github.com/cathfoliveira/data_engineering_solutions/blob/master/Final%Architecture.png" alt="Final Architecture">
+<img src="https://github.com/cathfoliveira/data_engineering_solutions/blob/main/Final%20Architecture.png">
+
+- [How & André Sionek](https://learn.howedu.com.br/curso/engenharia-de-dados)
