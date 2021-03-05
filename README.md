@@ -1,7 +1,7 @@
 
 # How Bootcamp - Data Engineering 
 
-:rocket: Learning how to build data engineering systems as a Big Data product. 
+:rocket: Learning how to build data engineering products in a Big Data ecosystem. 
 
 - Data Infrastruture as Code
 - CI/CD + Tests
