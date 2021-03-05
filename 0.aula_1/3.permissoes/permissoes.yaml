@@ -1,0 +1,19 @@
+Description:
+
+Resources:
+  IamRoleDataEngineer: #Criando um role
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: Json
+      
+      Description: String
+      ManagedPolicyArns: 
+        - String
+      MaxSessionDuration: Integer
+      Path: String
+      PermissionsBoundary: String
+      Policies: 
+        - Policy
+      RoleName: String
+      Tags: 
+        - Tag
