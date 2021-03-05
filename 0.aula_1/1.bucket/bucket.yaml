@@ -1,0 +1,17 @@
+Description: Cria bucket no S3
+# 
+Resources:
+  BucketBeliscoS3:
+    Type: AWS::S3::Bucket
+      Properties: 
+        BucketName: bucket-belisco-boot #Nomes de bucket na AWS são universais, somente uma pessoa no mundo pode ter esse nome
+        BucketEncription: # Vou descendo na documentação até chegar a tipos básicos
+          ServerSideEncryptionConfiguration: 
+              ServerSideEncryptionByDefault: # Ativando a criptografia da AWS por default. A chave está na documentação;
+                SSEAlgorithm: AES256
+        PublicAccessBlockConfiguration: # Bloquear acesso público
+          BlockPublicAcls: True
+          BlockPublicPolicy: True
+          IgnorePublicAcls: True
+          RestrictPublicBuckets: True
+        

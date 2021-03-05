@@ -1,0 +1,9 @@
+{
+    "Name": "Catharina Oliveira",
+    "Country": "Brazil",
+    "Sports": ["Indoor Soccer","Dancing"],
+    "Address": {
+        "Street": "1265 Bahia Str.",
+        "House": "Ap 309"
+    }
+}
