@@ -3,7 +3,7 @@
     "Country": "Brazil",
     "Sports": ["Indoor Soccer","Dancing"],
     "Address": {
-        "Street": "1265 Bahia Str.",
-        "House": "Ap 309"
+        "Street": "Afonso Pena Str.",
+        "House": "Apartment"
     }
 }
