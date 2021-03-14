@@ -1,19 +1,56 @@
-Description:
+Description: Cria grupo, funcao e politicas para o engenheiro de dados
 
-Resources:
+Resources: 
   IamRoleDataEngineer: #Criando um role
     Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument: Json
-      
-      Description: String
+    Properties:                       # Definindo qual a conta que poderá assumir este role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: 
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'    # Sub: Função do cloudformation que substitui uma variável dentro de uma string,
+            Action:                                              # neste caso específico, substitui pelo meu account id que é o número My Account.
+              - sts:AssumeRole
+      Description: Funcao para ser assumida pelo Engenheiro de Dados
       ManagedPolicyArns: 
-        - String
-      MaxSessionDuration: Integer
-      Path: String
-      PermissionsBoundary: String
-      Policies: 
-        - Policy
-      RoleName: String
-      Tags: 
-        - Tag
+        - !Ref IamPolicyDataEngineer                            # Preciso criar uma política para o role, que eh esta referencia.
+      RoleName: role-data-engineer
+
+  IamPolicyDataEngineer:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      Description: Politicas de acesso para DE      
+      PolicyDocument: 
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow             # Estou falando que o meu DE terá acesso a 
+            Action:                   # Pegar a localização do bucket, listar todos os buckets, listar os objetos do bucket
+              - s3:GetBucketLocation  # e pegar o objeto do bucket.
+              - s3:ListAllMyBuckets
+              - s3:ListBucket
+              - s3:GetObject          # Para adicionar o acesso de deleção: - s3:DeleteObject
+            Resource:
+              - arn:aws:s3:::*        # E estou utilizando o "*" para dizer que pode fazer isso para todos os buckets e não para um específico.
+                                      # Caso quisesse especificar, seria colocar o nome do bucket - arn:aws:s3:::bucket-belisco  
+  IamGroupDataEngineer:              # Cria um group para engenheiros de dados
+    Type: AWS::IAM::Group
+    Properties: 
+      GroupName: iam-group-data-engineer
+      ManagedPolicyArns:              # Especificando que o grupo DE vai assumir a Politica do Grupo
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+        - !Ref IamPolicyGroupDataEngineer
+
+  IamPolicyGroupDataEngineer:              # Cria a politica do grupo
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      Description: Politicas de acesso para o grupo de DEs      
+      PolicyDocument: 
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow             # Estou falando que o meu DE terá acesso a 
+            Action:                   # Pegar a localização do bucket, listar todos os buckets, listar os objetos do bucket
+              - sts:AssumeRole
+            Resource:
+              - !GetAtt IamRoleDataEngineer.Arn     #Outra função que fala que quer pegar o Arn da role.
+                                      
