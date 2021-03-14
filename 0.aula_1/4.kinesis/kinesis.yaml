@@ -1,0 +1,63 @@
+Resources:
+# Criando um firehose delivery stream
+  KinesisFirehoseBelisco:
+    Type: AWS::KinesisFirehose::DeliveryStream
+    Properties:
+      DeliveryStreamName: kinesis-firehose-belisco    # Nome na AWS
+      DeliveryStreamType: DirectPut                   # Permite inserir eventos no kinesis
+      S3DestinationConfiguration:
+        BucketARN: !GetAtt KinesisFirehoseBucket.Arn  # Estou falando onde vai salvar e será neste bucket q estou criando logo abaixo
+        BufferingHints:                               # Agregará os eventos a cada 60s ou a cada 1Mb e vai salvar num S3
+          IntervalInSeconds: 60
+          SizeInMBs: 1
+        CompressionFormat: GZIP
+        ErrorOutputPrefix: bad_record                 # Abaixo eu detalho em qual pasta do bucket irei salvar e coloquei pra pegar por partição mes/dia/hora
+        Prefix: "atomic_events/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+        RoleARN: !GetAtt KinesisRole.Arn              # O Kinesis precisa de permissão para escrever no S3, por isso preciso atribuir uma role e crio ela baixo.
+
+
+  KinesisFirehoseBucket:  
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: kinesis-firehose-bucket-belisco-ia-sp
+
+  KinesisRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: firehose.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: Role to allow Kinesis to save data to S3
+      ManagedPolicyArns:
+        - !Ref KinesisPolicy
+      Path: /
+      RoleName: role-kinesis
+
+  KinesisPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy to allow kinesis to access S3
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:AbortMultipartUpload
+              - s3:GetBucketLocation
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:ListBucketMultipartUploads
+              - s3:PutObject
+            Resource:
+              - !GetAtt KinesisFirehoseBucket.Arn
+              - !Join ["/", [!GetAtt KinesisFirehoseBucket.Arn, "*"]]
