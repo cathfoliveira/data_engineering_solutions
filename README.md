@@ -3,7 +3,7 @@
 
 :rocket: Learning how to build data engineering products in a Big Data ecosystem. 
 
-- Data Infrastruture as Code
+- Data Infrastructure as Code
 - CI/CD + Tests
 - Data Lakes
 - Apache Airflow and Streaming
