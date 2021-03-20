@@ -1,0 +1,96 @@
+Description: Cria um banco de dados redshift
+
+Resources: 
+
+  BeliscoRedshift:
+    Type: AWS::Redshift::Cluster
+    Properties: 
+      AllowVersionUpgrade: True
+      AutomatedSnapshotRetentionPeriod: 5       # Tira snapshots de tempos em tempos e aqui dizemos o período que gostaríamos que ficasse retido.
+      AvailabilityZone: sa-east-1a              # Dentro da regiao north virginia tem 3 data-centers, estamos colocando na 1a apenas, sem redundancia
+      ClusterIdentifier: my-redshift-cluster    # Nome do cluster que vai aparecer no painel, posso dar o nome desejado.
+      ClusterParameterGroupName: !Ref RedshiftParameterGroup    # Referencia o carinha la embaixo: 
+      ClusterSubnetGroupName: !Ref RedshiftSubnetGroup          # vou no google e olho como cria
+      VpcSecurityGroupIds: 
+        - !Ref RedshiftEC2SecurityGroup
+      ClusterType: multi-node                   # Indica que é para escalar horizontalmente
+      DBName: production
+      Encrypted: True
+      MasterUsername: admin
+      MasterUserPassword: Admin1234
+      NodeType: dc2.large                       # Define o tamanho em giga da minha cpu
+      NumberOfNodes: 2                          # Tamanho da instância que quero criar. 2 nós do tamanho dc2.large, resultando em 13$/dia.
+      PubliclyAccessible: true                 # True=outras pessoas podem acessar
+
+  RedshiftParameterGroup:             # Posso configurar para que ele aumente automaticamente o cluster quando uma aplicacao (pbix,por ex) estiver colocando o cluster no talo.
+    Type: AWS::Redshift::ClusterParameterGroup
+    Properties: 
+      Description: Parameter group for redshift cluster
+      ParameterGroupFamily: redshift-1.0
+      Parameters: 
+        - ParameterName: max_concurrency_scaling_clusters    # Defini que não quero que faça autoscaling. Mas poderia colocar 2 ou 3, por exemplo.
+          ParameterValue: 1
+ 
+  RedshiftSubnetGroup:                # Criando a rede onde o redshift estará disponível
+    Type: 'AWS::Redshift::ClusterSubnetGroup'
+    Properties: 
+      Description: Redshift Subnet Group
+      SubnetIds:
+        - !Ref RedshiftSubnet
+
+  RedshiftSubnet:         
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AvailabilityZone: sa-east-1a
+      CidrBlock: 10.0.0.0/24
+      VpcId: !Ref RedshiftVPC           # VPC é uma nuvem privada... somente recursos dentro da vpc poderao se o BD assim garanto isolamento no recurso. 
+
+  RedshiftVPC:         
+    Type: AWS::EC2::VPC
+    Properties: 
+      CidrBlock: 10.0.0.0/16  
+
+  RedshiftEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: Security Group for Redshift. Public Access.
+      GroupName: redshift-security-group
+      SecurityGroupEgress:            # Para onde ele pode mandar informação
+        -   CidrIp: 0.0.0.0/0
+            FromPort: 5439
+            IpProtocol: TCP
+            ToPort: 5439
+      SecurityGroupIngress:           # Está publicamente disponível-quem consegue acessar, ideal bloquear somente pro nosso IP.
+        -   CidrIp: 0.0.0.0/0         # Vou em My IP4 na internet pra olhar qual é o meu IP. "/32" significa que mapeia para apenas 1 endereço.
+            FromPort: 5439
+            IpProtocol: TCP
+            ToPort: 5439
+      VpcId: !Ref RedshiftVPC             
+
+  RedshiftVPCInternetGateway:         # Preciso de uma internet
+    Type: AWS::EC2::InternetGateway
+
+  RedshiftVPCAttachGateway:           # Preciso para ligar a internet à VPC
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      VpcId: !Ref RedshiftVPC 
+      InternetGatewayId: !Ref RedshiftVPCInternetGateway          
+
+  RedshiftRouteTable:           # Preciso para ligar a internet à VPC
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      VpcId: !Ref RedshiftVPC 
+
+  RedshiftVPCRoute:           # Preciso para ligar a internet à VPC
+    Type: AWS::EC2::Route
+    Properties: 
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref RedshiftVPCInternetGateway
+      RouteTableId: !Ref RedshiftRouteTable
+
+  RedshiftSubnetRouteTableAssociation:           # Preciso para ligar a internet à VPC
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref RedshiftRouteTable
+      SubnetId: !Ref RedshiftSubnet
+      
