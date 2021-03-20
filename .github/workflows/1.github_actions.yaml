@@ -27,7 +27,6 @@ jobs:
       run: |                          # Executa o arquivo definido
         python 2_continuous integration_and_tests/1.github_actions/deploy.py
 
-''' Secrets do github: vá em settings -> secrets, para setar as variáveis que são segredos do repositório.        
-AWS_ACCESS_KEY_ID - vai na conta da AWS->Canto superior direito onde está o ID -> Your Security Credenciais
--> Chave de Acesso -> Cria uma nova e pega o ID dela para este parâmetro e a chave para o parâmetro de chave.
-'''
+# Secrets do github: vá em settings -> secrets, para setar as variáveis que são segredos do repositório.        
+# AWS_ACCESS_KEY_ID - vai na conta da AWS->Canto superior direito onde está o ID -> Your Security Credenciais
+# -> Chave de Acesso -> Cria uma nova e pega o ID dela para este parâmetro e a chave para o parâmetro de chave.
