@@ -25,8 +25,9 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: |                          # Executa o arquivo definido
-        python 2_continuous integration_and_tests/1.github_actions/deploy.py
+        python 2_continuous_integration_and_tests/1.github_actions/deploy.py
 
 # Secrets do github: vá em settings -> secrets, para setar as variáveis que são segredos do repositório.        
 # AWS_ACCESS_KEY_ID - vai na conta da AWS->Canto superior direito onde está o ID -> Your Security Credenciais
 # -> Chave de Acesso -> Cria uma nova e pega o ID dela para este parâmetro e a chave para o parâmetro de chave.
+# Ao subir com o push na branch github_actions, posso acompanhar a execução na opção de Actions do Github.
