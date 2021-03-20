@@ -8,9 +8,4 @@ Resources:
         ServerSideEncryptionConfiguration: 
           - ServerSideEncryptionByDefault: 
               SSEAlgorithm: AES256
-      PublicAccessBlockConfiguration:       # Bloquear acesso público
-        BlockPublicAcls: True
-        BlockPublicPolicy: True
-        IgnorePublicAcls: True
-        RestrictPublicBuckets: True
         
