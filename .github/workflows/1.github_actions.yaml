@@ -5,8 +5,9 @@ on:
     branches:
       - github_actions
 
-# 1º Job
-jobs:
+jobs: 
+  
+  # 1º Job - de testes
   test:
     runs-on: ubuntu-latest
     steps:
@@ -21,10 +22,8 @@ jobs:
     - name: Run tests         # Nao precisa de credenciais                
       run: python -m pytest   # Se colocar só pytest pode dar erro, deste jeito está executando como pacote.
 
-# 2º Job: Executa o que eu definir (ex.: quando uma certa tag for adicionada, executa)
-jobs:
+  # 2º Job: Executa o que eu definir (ex.: quando uma certa tag for adicionada, executa)
   deploy:
-
     runs-on: ubuntu-latest          # Definindo onde vai rodar: neste caso, dentro de um docker com ubuntuu instalado
     needs: test                     # A adição desta tag, força a DEPENDÊNCIA entre os JOBS. O deploy só vai rodar se o job de test rodar com sucesso.
     steps:
