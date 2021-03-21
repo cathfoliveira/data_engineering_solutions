@@ -4,12 +4,29 @@ on:
   push:
     branches:
       - github_actions
-# Executa o que eu definir (ex.: quando uma certa tag for adicionada, executa)
+
+# 1º Job
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python           
+      uses: actions/setup-python@v2
+      with:           
+        python-version: '3.x'
+    - name: Install test dependencies
+      run: |    
+        pip install -r tests/requirements.txt
+    - name: Run tests         # Nao precisa de credenciais                
+      run: python -m pytest   # Se colocar só pytest pode dar erro, deste jeito está executando como pacote.
+
+# 2º Job: Executa o que eu definir (ex.: quando uma certa tag for adicionada, executa)
 jobs:
   deploy:
 
     runs-on: ubuntu-latest          # Definindo onde vai rodar: neste caso, dentro de um docker com ubuntuu instalado
-
+    needs: test                     # A adição desta tag, força a DEPENDÊNCIA entre os JOBS. O deploy só vai rodar se o job de test rodar com sucesso.
     steps:
     - uses: actions/checkout@v2     # Primeira coisa é usar a função do gith act para copiar meu codigo para dentro do docker
     - name: Set up Python           
