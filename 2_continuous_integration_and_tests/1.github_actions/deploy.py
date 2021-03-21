@@ -16,16 +16,12 @@ def create_stack(stack_name, template_body, **kwargs):
         TimeoutInMinutes=30,    # Depois de 30 min, falha e se falhar, faz um rollback.
         OnFailure='ROLLBACK'
     )
-
-    # Retorna um objeto que espera por algo. Neste caso, aguarda a criação do stack e a cada 5 minutos 
-    # quero que tente, por no máximo 600 vezes
+    # Retorna um objeto que espera por algo. Neste caso, aguarda a criação do stack e a cada 5 minutos quero que tente, por no máximo 600 vezes
     cloudformation_client.get_waiter('stack_create_complete').wait(
         StackName=stack_name,
         WaiterConfig={'Delay': 5, 'MaxAttempts': 600}
     )
-
-    # Terminou o create_complete, quero mais uma confirmação pra saber se foi completo.  Se o stack existir,
-    # eureka, mas se falhar, ele vai mostrar um erro. 
+    # Terminou o create_complete, quero mais uma confirmação pra saber se foi completo.  Se o stack existir, eureka, mas se falhar, ele vai mostrar um erro. 
     cloudformation_client.get_waiter('stack_exists').wait(StackName=stack_name)
     logging.info(f'CREATE COMPLETE')
 
