@@ -102,6 +102,3 @@ def renderiza_template():
 if __name__ == '__main__':
     renderiza_template()
     create_or_update_stack()
-
-# É preciso criar uma pasta "".github" na raiz do projeto para o github buscar as configs
-# e as actions nela para executar o deploy. É mandatório. E dentro, criar uma pasta chamada workflows.
