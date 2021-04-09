@@ -62,11 +62,10 @@ def _get_abs_path(path):
 
 # Função que cria ou upd stack. Passo o arquivo como nome, ele irá abrir e ler o arquivo como string.
 def create_or_update_stack():
-    stack_name = 's3-bucket-ci'
-    with open(_get_abs_path('bucket_github_actions.yaml')) as f:
+    stack_name = f'redshift-{os.environ["ENVIRONMENT"]}'
+    with open(_get_abs_path('redshift.yaml')) as f:
         template_body = f.read()
 
-    # pega as stacks existentes, se existir, faz update, senão, faz um create.
     existing_stacks = get_existing_stacks()
 
     if stack_name in existing_stacks:
@@ -75,6 +74,7 @@ def create_or_update_stack():
     else:
         logging.info(f'CREATING STACK {stack_name}')
         create_stack(stack_name, template_body)
+
 
 # Trouxe do process_template.py para automatizar via o deploy, ele vai renderizar internamente no github.
 def renderiza_template():
