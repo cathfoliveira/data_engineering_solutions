@@ -1,0 +1,15 @@
+Resources:
+
+  BucketBeliscoS3:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: bucket-belisco-boot-github-actions
+      BucketEncryption:                
+        ServerSideEncryptionConfiguration: 
+          - ServerSideEncryptionByDefault: 
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:       # Bloquear acesso público
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True        

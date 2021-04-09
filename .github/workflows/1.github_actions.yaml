@@ -1,0 +1,49 @@
+name: Deploy S3 bucket
+# Gatilho para o workflow: Estou dizendo que, ao haver um push nas branches definidas (lista de branches)
+on:
+  push:
+    branches:
+      - github_actions
+
+jobs: 
+  
+  # 1º Job - de testes
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python           
+      uses: actions/setup-python@v2
+      with:           
+        python-version: '3.x'
+    - name: Install test dependencies
+      run: |    
+        pip install -r tests/requirements.txt
+    - name: Run tests         # Nao precisa de credenciais                
+      run: python -m pytest   # Se colocar só pytest pode dar erro, deste jeito está executando como pacote.
+
+  # 2º Job: Executa o que eu definir (ex.: quando uma certa tag for adicionada, executa)
+  deploy:
+    runs-on: ubuntu-latest          # Definindo onde vai rodar: neste caso, dentro de um docker com ubuntuu instalado
+    needs: test                     # A adição desta tag, força a DEPENDÊNCIA entre os JOBS. O deploy só vai rodar se o job de test rodar com sucesso.
+    steps:
+    - uses: actions/checkout@v2     # Primeira coisa é usar a função do gith act para copiar meu codigo para dentro do docker
+    - name: Set up Python           
+      uses: actions/setup-python@v2 # Instala o python, usando uma função do gith act.
+      with:           
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |                         # Arquivo de requirements na raiz do projeto.
+        pip install -r requirements.txt
+    - name: Deploy                   # Defini as variáveis de ambiente com as credenciais que o git usará pra validar 
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}         # Vai entrar dentro do github, em segredos do github e vai procurar a vairável la.
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      run: |                          # Executa o arquivo definido
+        python 2_continuous_integration_and_tests/1.github_actions/deploy.py
+
+# Secrets do github: vá em settings -> secrets, para setar as variáveis que são segredos do repositório.        
+# AWS_ACCESS_KEY_ID - vai na conta da AWS->Canto superior direito onde está o ID -> Your Security Credenciais
+# -> Chave de Acesso -> Cria uma nova e pega o ID dela para este parâmetro e a chave para o parâmetro de chave.
+# Ao subir com o push na branch github_actions, posso acompanhar a execução na opção de Actions do Github.

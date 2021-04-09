@@ -13,7 +13,7 @@ Resources:
         CompressionFormat: GZIP
         ErrorOutputPrefix: bad_record                 # Abaixo eu detalho em qual pasta do bucket irei salvar e coloquei pra pegar por partição mes/dia/hora
         Prefix: "atomic_events/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-        RoleARN: !GetAtt KinesisRole.Arn              # O Kinesis precisa de permissão para escrever no S3, por isso preciso atribuir uma role e crio ela baixo.
+        RoleARN: !GetAtt KinesisRole.Arn              # O Kinesis precisa de permissão para escrever no S3, por isso preciso atribuir uma role e crio ela baixo(e é preciso os arquivos no path .aws")
 
 
   KinesisFirehoseBucket:  

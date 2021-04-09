@@ -1,0 +1,23 @@
+name: Deploy S3 bucket
+
+on:
+  push:
+    branches:
+      - "*"   # Roda quando qq branch for commitada
+
+jobs: 
+  
+  # Exemplo rodando arq separadoo
+  test:
+    runs-on: ubuntu-latest          
+    steps:
+    - uses: actions/checkout@v2     # Primeira coisa é usar a função do gith act para copiar meu codigo para dentro do docker
+    - name: Set up Python           
+      uses: actions/setup-python@v2 # Instala o python, usando uma função do gith act.
+      with:           
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |                         # Arquivo de requirements na raiz do projeto.
+        pip install -r tests/requirements.txt
+    - name: Run tests                # Nao precisa de credenciais                
+      run: python -m pytest          

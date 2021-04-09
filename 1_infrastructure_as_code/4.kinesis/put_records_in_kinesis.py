@@ -1,9 +1,10 @@
+
 import boto3    # package python para interagir com recursos da AWS
 import json
 from fake_web_events import Simulation
-import psycopg3 # para importar os eventos para o banco de dados postgres/RDS. Neste caso, trato os eventos direto
-                # no código python. Para o exemplo atual trabalhado, estou colocando arquivo zipado dentro do S3.
 
+# psycopg3: para importar os eventos para o banco de dados postgres/RDS. Neste caso, trato os eventos direto
+# no código python. Para o exemplo atual trabalhado, estou colocando arquivo zipado dentro do S3.
 
 client = boto3.client('firehose')
 
