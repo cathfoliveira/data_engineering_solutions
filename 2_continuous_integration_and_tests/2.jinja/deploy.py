@@ -1,6 +1,8 @@
 import boto3
 import logging
 from botocore.exceptions import ClientError
+import jinja2
+import yaml
 import os
 
  # Criou um client pro cloudformation
@@ -76,12 +78,14 @@ def create_or_update_stack():
 
 # Trouxe do process_template.py para automatizar via o deploy, ele vai renderizar internamente no github.
 def renderiza_template():
+    logging.info(f'RENDERING JINJA')
+
     # Carrega como string na variável
-    with open('redshift.yaml.j2', 'r') as f:
+    with open(_get_abs_path('redshift.yaml.j2'), 'r') as f:
         redshift_yaml = f.read()
 
     # Carrega como dicionário na variável
-    with open('config.yaml', 'r') as f:
+    with open(_get_abs_path('config.yaml'), 'r') as f:
         config = yaml.safe_load(f)
 
     # Passo com base em qual arquivo quero fazer o template (em cima do arquivo lido).
@@ -90,12 +94,11 @@ def renderiza_template():
     redshift_rendered = redshift_template.render({**config, **os.environ})
     
     # Depois encontra o arquivo e escreve nele o resultado da renderização.
-    with open('redshift.yaml', 'w') as f:
+    with open(_get_abs_path('redshift.yaml'), 'w') as f:
         f.write(redshift_rendered)
+    logging.info(f'JINJA RENDERED')
+
 
 if __name__ == '__main__':
     renderiza_template()
     create_or_update_stack()
-
-# É preciso criar uma pasta "".github" na raiz do projeto para o github buscar as configs
-# e as actions nela para executar o deploy. É mandatório. E dentro, criar uma pasta chamada workflows.
