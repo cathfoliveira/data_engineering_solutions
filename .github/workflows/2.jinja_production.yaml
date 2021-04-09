@@ -1,0 +1,31 @@
+name: Deploy S3 bucket
+
+on:
+  push:
+    branches:
+      - main    # Quando mergear e rodar para a master, ele roda o teste e o deploy.
+
+jobs: 
+  
+  # Exemplo roda o deploy pra produção somente quando mergear
+  deploy:
+    runs-on: ubuntu-latest          
+    steps:
+    - uses: actions/checkout@v2     # Primeira coisa é usar a função do gith act para copiar meu codigo para dentro do docker
+    - name: Set up Python           
+      uses: actions/setup-python@v2 # Instala o python, usando uma função do gith act.
+      with:           
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |                         # Arquivo de requirements na raiz do projeto.
+        pip install -r requirements.txt    
+    - name: Deploy                   # Defini as variáveis de ambiente com as credenciais que o git usará pra validar 
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}         # Vai entrar dentro do github, em segredos do github e vai procurar a vairável la.
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        redshiftClusterMasterUsername: ${{ secrets.redshiftClusterMasterUsername }}
+        redshiftClusterMasterUserPassword: ${{ secrets.redshiftClusterMasterUserPassword }}        
+        ENVIRONMENT: production
+      run: |                          # Executa o arquivo definido
+        python 2_continuous_integration_and_tests/2.jinja/deploy.py
