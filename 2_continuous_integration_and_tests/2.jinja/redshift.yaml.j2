@@ -8,18 +8,18 @@ Resources:
       AllowVersionUpgrade: true
       AutomatedSnapshotRetentionPeriod: 5
       AvailabilityZone: sa-east-1a
-      ClusterIdentifier: redshift--cluster   # Sempre que abrir e fechar 2 chaves significa que é uma variável jinja
+      ClusterIdentifier: redshift-{{ ENVIRONMENT }}-cluster   # Sempre que abrir e fechar 2 chaves significa que é uma variável jinja
       ClusterParameterGroupName: !Ref RedshiftParameterGroup  # neste caso, está colocando uma variável de ambiente (producao, staging..)
       ClusterSubnetGroupName: !Ref RedshiftSubnetGroup        # e estou subindo com o mesmo script, sem precisar subir scripts diferentes.
       VpcSecurityGroupIds:
         - !Ref RedshiftEC2SecurityGroup
       ClusterType: multi-node
-      DBName: app                    # Vai varrer o config.yaml até encontrar redshiftcluster->cluster e vai preencher com o conteúdo(app).
+      DBName: {{ redshiftCluster.dbName }}                    # Vai varrer o config.yaml até encontrar redshiftcluster->cluster e vai preencher com o conteúdo(app).
       Encrypted: true
-      MasterUsername:      # Nao esta no arquivo, mas posso add como variável no github_actions.
-      MasterUserPassword: 
-      NodeType: dc2.large
-      NumberOfNodes: 2
+      MasterUsername: {{ redshiftClusterMasterUsername }}     # Nao esta no arquivo, mas posso add como variável no github_actions.
+      MasterUserPassword: {{ redshiftClusterMasterUserPassword }}
+      NodeType: {{ redshiftCluster.nodeType }}
+      NumberOfNodes: {{ redshiftCluster.numberOfNodes }}
       PubliclyAccessible: true
       IamRoles:
         - !GetAtt RedshiftRole.Arn
@@ -40,39 +40,39 @@ Resources:
         - ParameterName: max_concurrency_scaling_clusters
           ParameterValue: 0
 
-             # Vai percorrer um for na lista de ambientes até encontrar o equivalente ao logado.
-  
-             # Vai percorrer um for na lista de ambientes até encontrar o equivalente ao logado.
-  
-  
+  {% for env in environments %}           # Vai percorrer um for na lista de ambientes até encontrar o equivalente ao logado.
+  {% if env.name == ENVIRONMENT %}        # E vai preencher as infos abaixo. Se não encontrar, deixará em branco.
+  RedshiftVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: {{ env.vpcCidrBlock }}
+
+  RedshiftSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: us-east-1a
+      CidrBlock: {{ env.subnetCidrBlock }}
+      VpcId: !Ref RedshiftVPC
+  {% endif %}
+  {% endfor %}
 
   RedshiftEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Redshift. Public access
-      GroupName: redshift--security-group
+      GroupName: redshift-{{ ENVIRONMENT }}-security-group
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           FromPort: 5439
           IpProtocol: tcp
           ToPort: 5439
       SecurityGroupIngress:
-      
-        - CidrIp: 5.6.7.8/32      # Lerá os ips do arquivo e novo for para preencher todos da lista aqui.
+      {% for ip in redshiftCluster.securityGroup.whitelistedIps %}
+        - CidrIp: {{ ip }}      # Lerá os ips do arquivo e novo for para preencher todos da lista aqui.
           FromPort: 5439
           IpProtocol: tcp
           ToPort: 5439
-      
-        - CidrIp: 1.2.3.4/32      # Lerá os ips do arquivo e novo for para preencher todos da lista aqui.
-          FromPort: 5439
-          IpProtocol: tcp
-          ToPort: 5439
-      
-        - CidrIp: 9.10.11.12/32      # Lerá os ips do arquivo e novo for para preencher todos da lista aqui.
-          FromPort: 5439
-          IpProtocol: tcp
-          ToPort: 5439
-      
+      {% endfor %}
       VpcId: !Ref RedshiftVPC
 
   RedshiftEC2SecurityGroupIngress:
@@ -124,7 +124,7 @@ Resources:
             Action:
               - sts:AssumeRole
       Path: "/"
-      RoleName: iam--redshift-role
+      RoleName: iam-{{ ENVIRONMENT }}-redshift-role
 
   RedshiftSpectrumPolicy:
     Type: AWS::IAM::Policy
@@ -165,6 +165,6 @@ Resources:
               - athena:*
             Resource:
               - "*"
-      PolicyName: iam--redshift-spectrum-policy
+      PolicyName: iam-{{ ENVIRONMENT }}-redshift-spectrum-policy
       Roles:
         - !Ref RedshiftRole

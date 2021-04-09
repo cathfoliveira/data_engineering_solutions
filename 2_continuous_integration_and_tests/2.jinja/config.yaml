@@ -1,0 +1,18 @@
+environments:
+  - name: production                # Estou definindo o ambiente de producao, a vpc, a subnet
+    vpcCidrBlock: 10.0.0.0/16
+    subnetCidrBlock: 10.0.0.0/24
+  - name: staging                   # Tb ambiente de staging, uma vpc e uma subnet diferentes
+    vpcCidrBlock: 10.1.0.0/16
+    subnetCidrBlock: 10.1.0.0/24
+
+
+redshiftCluster:
+  dbName: app                       # Nome do banco de dados, 
+  nodeType: dc2.large               # Tipo do banco, número de nós, white list com os ips definidos.
+  numberOfNodes: 2
+  securityGroup:
+    whitelistedIps:
+      - 5.6.7.8/32
+      - 1.2.3.4/32
+      - 9.10.11.12/32
