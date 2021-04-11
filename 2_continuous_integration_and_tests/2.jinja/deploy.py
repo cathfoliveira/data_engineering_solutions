@@ -16,7 +16,7 @@ def create_stack(stack_name, template_body, **kwargs):
         TemplateBody=template_body,
         Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'], # Autoriza o IAM a criar os recursos com o nome que quiser
         TimeoutInMinutes=30,    # Depois de 30 min, falha e se falhar, faz um rollback.
-        OnFailure='DELETE'
+        OnFailure='ROLLBACK'
     )
     # Retorna um objeto que espera por algo. Neste caso, aguarda a criação do stack e a cada 5 minutos quero que tente, por no máximo 600 vezes
     cloudformation_client.get_waiter('stack_create_complete').wait(
@@ -102,6 +102,3 @@ def renderiza_template():
 if __name__ == '__main__':
     renderiza_template()
     create_or_update_stack()
-
-# É preciso criar uma pasta "".github" na raiz do projeto para o github buscar as configs
-# e as actions nela para executar o deploy. É mandatório. E dentro, criar uma pasta chamada workflows.
