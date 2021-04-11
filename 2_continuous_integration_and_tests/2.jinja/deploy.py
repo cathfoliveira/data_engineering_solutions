@@ -16,7 +16,7 @@ def create_stack(stack_name, template_body, **kwargs):
         TemplateBody=template_body,
         Capabilities=['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'], # Autoriza o IAM a criar os recursos com o nome que quiser
         TimeoutInMinutes=30,    # Depois de 30 min, falha e se falhar, faz um rollback.
-        OnFailure='ROLLBACK'
+        OnFailure='DELETE'
     )
     # Retorna um objeto que espera por algo. Neste caso, aguarda a criação do stack e a cada 5 minutos quero que tente, por no máximo 600 vezes
     cloudformation_client.get_waiter('stack_create_complete').wait(
