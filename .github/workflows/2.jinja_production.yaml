@@ -3,7 +3,8 @@ name: Deploy S3 bucket
 on:
   push:
     branches:
-      - main    # Quando mergear e rodar para a master, ele roda o teste e o deploy.
+      - jinja_production
+      #- main    # Quando mergear e rodar para a master, ele roda o teste e o deploy.
 
 jobs: 
   
