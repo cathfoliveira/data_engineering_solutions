@@ -16,8 +16,7 @@ jobs:
       with: 
         python-version: '3.x'
     - name: Install dependencies
-      run: | 
-        npm install -g aws-cdk           
+      run: |           
         pip install -r requirements.txt    
     - name: Deploy    
       env:
