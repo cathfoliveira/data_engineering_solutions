@@ -10,7 +10,6 @@ from aws_cdk import aws_s3 as s3
 
 from cdk.cdk_stack import CdkStack
 
-
 app = cdk.App()
 CdkStack(app, "CdkStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
