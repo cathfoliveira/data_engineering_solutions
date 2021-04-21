@@ -3,7 +3,7 @@ name: Deploy CDK - S3 bucket
 on:
   push:
     branches:
-      - cdk_new
+      - cdk_deploy_bb
 
 jobs: 
   
@@ -19,13 +19,16 @@ jobs:
       with: 
         node-version: '12'        
     - name: Install dependencies
-      run: |                 
-        pip install -r requirements.txt    
+      run: |                  
         sudo npm install -g aws-cdk   
+        cd 2_continuous_integration_and_tests/CDK
+        pip install -r requirements.txt   
     - name: Deploy    
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}      
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       run: | 
+        cd 2_continuous_integration_and_tests/CDK
+        cdk synth
         cdk deploy
