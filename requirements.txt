@@ -4,3 +4,4 @@ pyathena
 pyaml
 jinja2
 pytest
+aws_cdk.aws_s3

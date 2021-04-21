@@ -3,7 +3,8 @@ name: Deploy S3 bucket
 on:
   push:
     branches:
-      - "*"   # Roda quando qq branch for commitada
+      - test_action
+      #- "*"   # Roda quando qq branch for commitada
 
 jobs: 
   
