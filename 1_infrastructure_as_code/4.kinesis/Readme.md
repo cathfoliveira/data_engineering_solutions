@@ -36,7 +36,7 @@ Uso:
         [profile my_aws_profile]
         aws_access_key_id = AK... 
         aws_secret_access_key = sl...
-        region = us-east-1
+        region = sa-east-1
         ```
     1.  Adicione ao ambiente: `export AWS_PROFILE=my_aws_profile` ou adicione ao seu `.bashrc` se quiser 
     persistir a variável para outras sessões
