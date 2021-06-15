@@ -7,7 +7,7 @@
 - CI/CD + Tests
 - Data Lakes
 - Apache Airflow and Streaming
-- Data Modeling
+- Data Modeling with DBT
 
 <img src="https://github.com/cathfoliveira/data_engineering_solutions/blob/main/Final%20Architecture.png">
 
